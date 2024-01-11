@@ -8,46 +8,70 @@ return {
         },
     },
     {
-        "hrsh7th/nvim-cmp",
-        config = function()
-            local cmp = require("cmp")
-            require("luasnip.loaders.from_vscode").lazy_load()
+        "zbirenbaum/copilot.lua",
+        cmd = "Copilot",
+        build = ":Copilot auth",
+        event = "InsertEnter",
 
-            cmp.setup({
-                snippet = {
-                    -- REQUIRED - you must specify a snippet engine
-                    expand = function(args)
-                        require("luasnip").lsp_expand(args.body)
-                    end,
+        config = function()
+            require("copilot").setup({
+                panel = {
+                    enabled = true,
+                    auto_refresh = true,
                 },
-                window = {
-                    completion = cmp.config.window.bordered(),
-                    documentation = cmp.config.window.bordered(),
+                suggestion = {
+                    enabled = true,
+                    auto_trigger = true,
+                    accept = false, -- disable built-in keymapping
                 },
-                mapping = cmp.mapping.preset.insert({
-                    ["<C-k>"] = cmp.mapping.select_prev_item(),
-                    ["<C-j>"] = cmp.mapping.select_next_item(),
-                    ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-                    ["<C-f>"] = cmp.mapping.scroll_docs(4),
-                    ["<C-Space>"] = cmp.mapping.complete(),
-                    ["<C-e>"] = cmp.mapping.close(),
-                    ["<CR>"] = cmp.mapping.confirm({ select = false }),
-                }),
-                sources = cmp.config.sources({
-                    -- { name = "nvim_lsp" },
-                    { name = "copilot", group_index = 2 },
-                    -- { name = "vsnip" }, -- For vsnip users.
-                    { name = "luasnip", group_index = 2 },
-                }, {
-                    { name = "buffer" },
-                }),
             })
+
+            -- hide copilot suggestions when cmp menu is open
+            -- to prevent odd behavior/garbled up suggestions
+            local cmp_status_ok, cmp = pcall(require, "cmp")
+            if cmp_status_ok then
+                cmp.event:on("menu_opened", function()
+                    vim.b.copilot_suggestion_hidden = true
+                end)
+
+                cmp.event:on("menu_closed", function()
+                    vim.b.copilot_suggestion_hidden = false
+                end)
+            end
         end,
     },
-    -- {
-    --     "zbirenbaum/copilot-cmp",
-    --     config = function()
-    --         require("copilot_cmp").setup()
-    --     end,
-    -- },
+    {
+        {
+            "nvim-lualine/lualine.nvim",
+            optional = true,
+            event = "VeryLazy",
+            opts = function(_, opts)
+                local Util = require("lazyvim.util")
+                local colors = {
+                    [""] = Util.ui.fg("Special"),
+                    ["Normal"] = Util.ui.fg("Special"),
+                    ["Warning"] = Util.ui.fg("DiagnosticError"),
+                    ["InProgress"] = Util.ui.fg("DiagnosticWarn"),
+                }
+                table.insert(opts.sections.lualine_x, 2, {
+                    function()
+                        local icon = require("lazyvim.config").icons.kinds.Copilot
+                        local status = require("copilot.api").status.data
+                        return icon .. (status.message or "")
+                    end,
+                    cond = function()
+                        local ok, clients = pcall(vim.lsp.get_active_clients, { name = "copilot", bufnr = 0 })
+                        return ok and #clients > 0
+                    end,
+                    color = function()
+                        if not package.loaded["copilot"] then
+                            return
+                        end
+                        local status = require("copilot.api").status.data
+                        return colors[status.status] or colors[""]
+                    end,
+                })
+            end,
+        },
+    },
 }
