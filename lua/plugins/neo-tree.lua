@@ -22,9 +22,9 @@ return {
                 },
                 always_show = { -- remains visible even if other settings would normally hide it
                     --".gitignored",
-                    -- ".env*",
-                    -- ".env.*",
-                    -- ".env",
+                    ".env*",
+                    ".env.*",
+                    ".env",
                 },
                 never_show = { -- remains hidden even if visible is toggled to true, this overrides always_show
                     --".DS_Store",
