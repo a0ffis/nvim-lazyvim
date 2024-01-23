@@ -4,6 +4,6 @@
 local opt = vim.opt
 
 opt.smartindent = true
-opt.shiftwidth = 4
+-- opt.shiftwidth = 4
 
-vim.opt.foldlevel = 120
+vim.opt.foldlevel = 180
