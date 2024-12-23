@@ -9,6 +9,28 @@ return {
                 -- Ensure the sources table exists
                 opts.sources = opts.sources or {}
 
+                -- Add ESLint as a linter
+                null_ls.setup({
+                    sources = {
+                        null_ls.builtins.code_actions.eslint,
+                        null_ls.builtins.formatting.prettier,
+                    },
+                })
+
+                vim.api.nvim_set_keymap(
+                    "n",
+                    "<leader>ru",
+                    '<cmd>lua print("Removing unused imports...")<CR><cmd>lua vim.lsp.buf.code_action({context = {only = {"source.removeUnusedImports"}}, apply = true})<CR>',
+                    { noremap = true, silent = true }
+                )
+
+                -- vim.api.nvim_set_keymap(
+                --     "n",
+                --     "<Leader>oi",
+                --     "<cmd>lua vim.lsp.buf.code_action()<CR>",
+                --     { noremap = true, silent = true }
+                -- )
+
                 -- Add Prettier as a formatter
                 vim.list_extend(opts.sources, {
                     null_ls.builtins.formatting.prettier.with({
