@@ -26,7 +26,7 @@ return {
                 },
             })
 
-            -- hide copilot suggestions when cmp menu is open
+            -- hide copilot suggestions when cmp menu is oen
             -- to prevent odd behavior/garbled up suggestions
             local cmp_status_ok, cmp = pcall(require, "cmp")
             if cmp_status_ok then

@@ -5,6 +5,7 @@ return {
         "hrsh7th/nvim-cmp",
         dependencies = {
             "hrsh7th/cmp-emoji",
+            { "roobert/tailwindcss-colorizer-cmp.nvim", config = true },
             opts = nil,
         },
         ---@param opts cmp.ConfigSchema
