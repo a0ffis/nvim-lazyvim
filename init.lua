@@ -1,6 +1,10 @@
 -- bootstrap lazy.nvim, LazyVim and your plugins
 require("config.lazy")
 
+vim.opt.clipboard = "unnamedplus"
+vim.opt.encoding = "utf-8"
+vim.opt.fileencoding = "utf-8"
+
 vim.api.nvim_set_keymap(
     "n",
     "<leader>ru",
