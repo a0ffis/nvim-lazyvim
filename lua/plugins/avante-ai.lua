@@ -4,7 +4,7 @@ return {
     lazy = false,
     version = false, -- set this if you want to always pull the latest change
     opts = {
-        -- add any opts here
+        -- add any opts here open ai
         provider = "openai",
         openai = {
             model = "gpt-4o-mini",
