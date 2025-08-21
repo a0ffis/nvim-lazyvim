@@ -60,6 +60,7 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePre" }, {
         "*.xml",
         "*.toml",
         "*.dart",
+        "*.php",
     },
     callback = function(ev)
         check_and_remove_terminators()

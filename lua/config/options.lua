@@ -7,3 +7,4 @@
 -- opt.shiftwidth = 4
 
 -- vim.opt.foldlevel = 180
+vim.g.autoformat = false
