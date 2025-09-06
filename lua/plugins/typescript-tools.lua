@@ -1,0 +1,51 @@
+-- lua/plugins/typescript-tools.lua
+return {
+  -- "pmizio/typescript-tools.nvim",
+  -- dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+  -- ft = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
+  -- opts = function()
+  --   local util = require("lspconfig.util")
+  --
+  --   return {
+  --     -- ปรับให้ลื่นขึ้น
+  --     separate_diagnostic_server = true,           -- แยก process diagnostics ลดหน่วง
+  --     publish_diagnostic_on = "insert_leave",      -- ไม่รบกวนตอนพิมพ์
+  --     tsserver_max_memory = 4096,                  -- กัน memory spike
+  --     expose_as_code_action = "all",               -- ให้คำสั่งดัง ๆ โผล่ใน code actions
+  --
+  --     -- ปรับ preferences ที่ช่วยการเขียนจริง
+  --     tsserver_file_preferences = {
+  --       includeCompletionsForModuleExports = true,
+  --       includeCompletionsWithSnippetText = true,
+  --       quotePreference = "auto",
+  --       includeInlayParameterNameHints = "all",
+  --       includeInlayFunctionLikeReturnTypeHints = true,
+  --       includeInlayVariableTypeHints = true,
+  --       includeInlayPropertyDeclarationTypeHints = true,
+  --       includeInlayFunctionParameterTypeHints = true,
+  --       includeInlayEnumMemberValueHints = true,
+  --     },
+  --
+  --     -- hook เพิ่มเติม
+  --     on_attach = function(client, bufnr)
+  --       -- ถ้าใช้ prettier/conform ให้ปิด formatting จาก tsserver เพื่อลด conflict/lag
+  --       client.server_capabilities.documentFormattingProvider = false
+  --
+  --       local map = function(mode, lhs, rhs, desc)
+  --         vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
+  --       end
+  --       -- คำสั่งยอดฮิตของ typescript-tools
+  --       map("n", "<leader>co", "<cmd>TSToolsOrganizeImports<CR>", "TS: Organize imports")
+  --       map("n", "<leader>cu", "<cmd>TSToolsRemoveUnused<CR>",    "TS: Remove unused")
+  --       map("n", "<leader>ca", "<cmd>TSToolsAddMissingImports<CR>","TS: Add missing imports")
+  --       map("n", "<leader>cf", "<cmd>TSToolsFixAll<CR>",          "TS: Fix all")
+  --       map("n", "gD",        "<cmd>TSToolsGoToSourceDefinition<CR>", "TS: Source definition")
+  --     end,
+  --
+  --     -- รากโปรเจกต์
+  --     root_dir = function(fname)
+  --       return util.root_pattern("tsconfig.json", "package.json", "jsconfig.json", ".git")(fname)
+  --     end,
+  --   }
+  -- end,
+}

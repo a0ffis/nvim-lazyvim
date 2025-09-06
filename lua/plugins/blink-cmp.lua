@@ -1,0 +1,66 @@
+return {
+  -- "saghen/blink.cmp",
+  -- dependencies = { "rafamadriz/friendly-snippets" },
+  -- version = "1.*",
+  -- opts = function(_, opts)
+  --   opts.sources = {
+  --     default = { "lsp" },
+  --     providers = {
+  --       lsp = {
+  --         max_items = 40,
+  --         score_offset = 100,
+  --       },
+  --     },
+  --   }
+  --
+  --   opts.completion = {
+  --     menu = {
+  --       -- border = "rounded",
+  --       -- max_height = 12,
+  --       draw = {
+  --         columns = { { "label", "label_description", gap = 1 }, { "kind_icon", "kind" } },
+  --         treesitter = { enabled = false },
+  --       },
+  --     },
+  --     documentation = { auto_show = true, auto_show_delay_ms = 60 },
+  --     accept = { auto_brackets = { enabled = true } },
+  --     ghost_text = { enabled = true },
+  --     list = { selection = { preselect = true, auto_insert = true } },
+  --   }
+  --
+  --   opts.signature = {
+  --     enabled = true,
+  --     -- window = { border = "rounded" },
+  --   }
+  --
+  --   opts.fuzzy = { implementation = "prefer_rust_with_warning" }
+  --   opts.appearance = { nerd_font_variant = "mono" }
+  --
+  --   -- ✅ keymap เดิมของคุณ กลับมาแล้ว
+  --   opts.keymap = {
+  --     ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
+  --     ["<C-e>"] = { "hide", "fallback" },
+  --
+  --     ["<Tab>"] = {
+  --       function(cmp)
+  --         if cmp.snippet_active() then
+  --           return cmp.accept()
+  --         else
+  --           return cmp.select_and_accept()
+  --         end
+  --       end,
+  --       "snippet_forward",
+  --       "fallback",
+  --     },
+  --     ["<S-Tab>"] = { "snippet_backward", "fallback" },
+  --
+  --     ["<Up>"] = { "select_prev", "fallback" },
+  --     ["<Down>"] = { "select_next", "fallback" },
+  --     ["<C-k>"] = { "select_prev", "fallback_to_mappings" },
+  --     ["<C-j>"] = { "select_next", "fallback_to_mappings" },
+  --   }
+  --
+  --   return opts
+  -- end,
+  -- opts_extend = {},
+}
