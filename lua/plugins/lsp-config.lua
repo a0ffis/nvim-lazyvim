@@ -1,405 +1,192 @@
--- lua/plugins/lsp-vue-nuxt.lua
 return {
---     "neovim/nvim-lspconfig",
---     version = "^1.0.0",
---     lazy = false,
---     config = function()
---       local lspconfig = require("lspconfig")
---       local mason_lspconfig = require("mason-lspconfig")
---
---       -- ⬇️ ใช้ blink.cmp แทน cmp-nvim-lsp
---       local capabilities = vim.lsp.protocol.make_client_capabilities()
---       local ok, blink = pcall(require, "blink.cmp")
---       if ok then
---         capabilities = blink.get_lsp_capabilities(capabilities)
---       end
---       capabilities.offsetEncoding = { "utf-8" }
---       capabilities.positionEncodings = { "utf-8" }
---
---       mason_lspconfig.setup_handlers({
---         function(server_name)
---           lspconfig[server_name].setup({
---             capabilities = capabilities,
---           })
---         end,
---
---         ["emmet_ls"] = function()
---           lspconfig.emmet_ls.setup({
---             capabilities = capabilities,
---             filetypes = {
---               "html", "typescriptreact", "javascriptreact",
---               "css", "sass", "scss", "less", "vue", "svelte",
---             },
---           })
---         end,
---
---         ["basedpyright"] = function()
---           lspconfig.basedpyright.setup({
---             settings = {
---               python = {
---                 analysis = {
---                   autoSearchPaths = true,
---                   diagnosticMode = "openFilesOnly",
---                   useLibraryCodeForTypes = true,
---                   enableReachabilityAnalysis = false,
---                 },
---               },
---             },
---             capabilities = capabilities,
---             flags = { allow_incremental_sync = false },
---             on_attach = function(client, bufnr)
---               print("LSP attached: " .. client.name)
---               vim.api.nvim_buf_set_keymap(
---                 bufnr,
---                 "n",
---                 "<leader>ca",
---                 "<cmd>lua vim.lsp.buf.code_action()<CR>",
---                 { noremap = true }
---               )
---             end,
---             filetypes = { "python" },
---           })
---         end,
---
---         ["terraformls"] = function()
---           lspconfig.terraformls.setup({
---             capabilities = capabilities,
---             filetypes = { "terraform", "hcl", "tf" },
---             root_dir = require("lspconfig").util.root_pattern("*.tf"),
---             on_attach = function(_, bufnr)
---               vim.api.nvim_buf_set_option(bufnr, "commentstring", "# %s")
---             end,
---           })
---         end,
---
---         ["lua_ls"] = function()
---           lspconfig.lua_ls.setup({
---             capabilities = capabilities,
---             settings = {
---               Lua = {
---                 diagnostics = { globals = { "vim" } },
---                 completion = { callSnippet = "Replace" },
---               },
---             },
---           })
---         end,
---
---         ["volar"] = function()
---           lspconfig.volar.setup({
---             init_options = {
---               vue = { hybridMode = false },
---               typescript = {
---                 tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib",
---               },
---             },
---             settings = {
---               typescript = {
---                 inlayHints = {
---                   enumMemberValues = { enabled = true },
---                   functionLikeReturnTypes = { enabled = true },
---                   propertyDeclarationTypes = { enabled = true },
---                   parameterTypes = {
---                     enabled = true,
---                     suppressWhenArgumentMatchesName = true,
---                   },
---                   variableTypes = { enabled = true },
---                 },
---               },
---             },
---             capabilities = capabilities,
---           })
---         end,
---
---         ["ts_ls"] = function()
---           local mason_packages = vim.fn.stdpath("data") .. "/mason/packages"
---           local volar_path = mason_packages .. "/vue-language-server/node_modules/@vue/language-server"
---
---           lspconfig.ts_ls.setup({
---             init_options = {
---               plugins = {
---                 {
---                   name = "@vue/typescript-plugin",
---                   location = volar_path,
---                   languages = { "vue" },
---                 },
---               },
---             },
---             settings = {
---               typescript = {
---                 inlayHints = {
---                   includeInlayParameterNameHints = "all",
---                   includeInlayParameterNameHintsWhenArgumentMatchesName = true,
---                   includeInlayFunctionParameterTypeHints = true,
---                   includeInlayVariableTypeHints = true,
---                   includeInlayVariableTypeHintsWhenTypeMatchesName = true,
---                   includeInlayPropertyDeclarationTypeHints = true,
---                   includeInlayFunctionLikeReturnTypeHints = true,
---                   includeInlayEnumMemberValueHints = true,
---                 },
---               },
---             },
---             capabilities = capabilities,
---           })
---         end,
---       })
---       -- (ถ้ามี LspAttach/autocmd เดิม สามารถปล่อยคอมเมนต์ไว้ได้เหมือนเดิม)
---     end,
--- },
---   -- {
---   --   "neovim/nvim-lspconfig",
---   --   opts = function(_, opts)
---   --     local blink = require("blink.cmp")
---   --     opts.capabilities = vim.tbl_deep_extend(
---   --       "force",
---   --       opts.capabilities or {},
---   --       blink.get_lsp_capabilities()
---   --     )
---   --
---   --     local data = vim.fn.stdpath("data")
---   --     local mason = data .. "/mason/packages"
---   --     local vue_ts_plugin = mason .. "/vue-language-server/node_modules/@vue/language-server"
---   --
---   --     -- ใช้ TS ของโปรเจกต์ถ้ามี (Nuxt ต้องการ)
---   --     local function tsdk()
---   --       local p = vim.loop.cwd() .. "/node_modules/typescript/lib"
---   --       if vim.fn.isdirectory(p) == 1 then return p end
---   --       local mason_ts = mason .. "/typescript-language-server/node_modules/typescript/lib"
---   --       if vim.fn.isdirectory(mason_ts) == 1 then return mason_ts end
---   --       return nil
---   --     end
---   --
---   --     opts.servers = vim.tbl_deep_extend("force", opts.servers or {}, {
---   --       -- ✅ Volar ดูแลไฟล์ .vue (template/directives/@/:/props ฯลฯ)
---   --       volar = {
---   --         filetypes = { "vue" },
---   --         init_options = {
---   --           vue = { hybridMode = true },          -- ให้ส่วน script วิ่งผ่าน TS plugin
---   --           typescript = { tsdk = tsdk() },       -- ชี้ path TS
---   --         },
---   --       },
---   --
---   --       -- ✅ vtsls เฉพาะ ts/js ไม่ครอบ .vue
---   --       vtsls = {
---   --         filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
---   --         settings = {
---   --           vtsls = {
---   --             autoUseWorkspaceTsdk = true,
---   --             tsserver = {
---   --               globalPlugins = {
---   --                 {
---   --                   name = "@vue/typescript-plugin",
---   --                   location = vue_ts_plugin,
---   --                   languages = { "vue" },
---   --                   enableForWorkspaceTypeScriptVersions = true,
---   --                   configNamespace = "typescript",
---   --                 },
---   --               },
---   --             },
---   --           },
---   --         },
---   --       },
---   --
---   --       -- ✅ CSS in <style>
---   --       cssls = {
---   --         filetypes = { "css", "scss", "less", "vue" },
---   --       },
---   --
---   --       -- ✅ Tailwind (ถ้าโปรเจกต์ใช้)
---   --       tailwindcss = {
---   --         filetypes = { "html", "css", "scss", "vue", "javascriptreact", "typescriptreact" },
---   --       },
---   --
---   --       -- (ออปชัน) Emmet
---   --       emmet_language_server = {
---   --         filetypes = { "html", "css", "vue", "javascriptreact", "typescriptreact" },
---   --       },
---   --
---   --       -- กันซ้ำ
---   --       tsserver = { enabled = false },
---   --       ts_ls = { enabled = false },
---   --     })
---   --
---   --     return opts
---   --   end,
---   -- },
---
---   -- blink.cmp (LSP-only) – ทำให้แน่ใจว่าเมนูเด้ง
---   {
---     "saghen/blink.cmp",
---     opts = function(_, opts)
---       opts.sources = {
---         default = { "lsp" },
---       }
---       opts.completion = {
---         -- ถ้าอยากให้เด้งขณะพิมพ์แน่ ๆ ใส่ตัวนี้ (บางรุ่นเด้งอัตโนมัติอยู่แล้ว)
---         -- show_on_insert = true,  -- <— uncomment ถ้ายังไม่เด้งตอนพิมพ์
---         documentation = { auto_show = true, auto_show_delay_ms = 60 },
---         menu = {
---           border = "rounded",
---           max_height = 12,
---           draw = { columns = { { "label", "label_description", gap = 1 }, { "kind_icon", "kind" } },
---                    treesitter = { enabled = false } },
---         },
---         accept = { auto_brackets = { enabled = true } },
---         ghost_text = { enabled = true },
---         list = { selection = { preselect = true, auto_insert = true } },
---       }
---       return opts
---     end,
---     opts_extend = {},
---   },
+  -- Mason core
+  {
+    "williamboman/mason.nvim",
+    config = function()
+      require("mason").setup()
+    end,
+  },
+
+  -- Mason LSP bridge
+  {
+    "williamboman/mason-lspconfig.nvim",
+    lazy = false,
+    opts = { auto_install = true },
+  },
+
+  -- 🔁 blink.cmp
+  {
+    "saghen/blink.cmp",
+    lazy = false,
+    version = "*",
+    dependencies = {
+      "rafamadriz/friendly-snippets",
+    },
+    opts = {
+      -- ✅ keymap ตามที่ขอ
+      keymap = {
+        ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
+        ["<C-e>"] = { "hide", "fallback" },
+
+        ["<Tab>"] = {
+          function(cmp)
+            if cmp.snippet_active() then
+              return cmp.accept()
+            else
+              return cmp.select_and_accept()
+            end
+          end,
+          "snippet_forward",
+          "fallback",
+        },
+        ["<S-Tab>"] = { "snippet_backward", "fallback" },
+
+        ["<Up>"] = { "select_prev", "fallback" },
+        ["<Down>"] = { "select_next", "fallback" },
+        ["<C-k>"] = { "select_prev", "fallback_to_mappings" },
+        ["<C-j>"] = { "select_next", "fallback_to_mappings" },
+      },
+
+      -- ✅ แก้ selection ให้เป็น table (ไม่ใช่ string)
+      completion = {
+        list = { selection = { preselect = false, auto_insert = true } },
+        documentation = { auto_show = true, auto_show_delay_ms = 200 },
+        ghost_text = { enabled = true },
+      },
+
+      snippets = { preset = "default" },
+      sources = {
+        default = { "lsp", "path", "snippets", "buffer" },
+        -- ถ้าใช้ copilot และขึ้นซ้ำ 2 อัน ให้ลบ/ปิด copilot-cmp แล้วเพิ่ม/ลบ "copilot" ที่นี่ตามต้องการ
+        -- default = { "lsp", "path", "snippets", "buffer", "copilot" },
+      },
+      signature = { enabled = true },
+      appearance = {
+        use_nvim_cmp_as_default = true,
+        nerd_font_variant = "mono",
+      },
+    },
+  },
+
+  -- LSP config (ใช้ capabilities จาก blink.cmp)
+  {
+    "neovim/nvim-lspconfig",
+    dependencies = { "hoffs/omnisharp-extended-lsp.nvim" },
+    lazy = false,
+    config = function()
+      local lspconfig = require("lspconfig")
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
+
+      -- ESLint: fix on save + workspaceFolder
+      lspconfig.eslint.setup({
+        on_attach = function(_, bufnr)
+          vim.api.nvim_create_autocmd("BufWritePre", { buffer = bufnr, command = "EslintFixAll" })
+        end,
+        on_new_config = function(config, new_root_dir)
+          config.settings = config.settings or {}
+          config.settings.workspaceFolder = {
+            uri = vim.uri_from_fname(new_root_dir),
+            name = vim.fn.fnamemodify(new_root_dir, ":t"),
+          }
+        end,
+      })
+
+      -- Lua
+      lspconfig.lua_ls.setup({ capabilities = capabilities })
+
+
+      lspconfig.vtsls.setup({
+        capabilities = capabilities,
+        filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
+      })
+
+
+      -- ---------- Hybrid Vue (Volar + vtsls) ----------
+      local mason_registry = require("mason-registry")
+      local vue_language_server = mason_registry
+        .get_package("vue-language-server")
+        :get_install_path() .. "/node_modules/@vue/language-server"
+
+      local function get_tsdk(root_dir)
+        local local_ts = vim.fs.find("node_modules/typescript/lib", { path = root_dir, upward = true })[1]
+        if local_ts then return local_ts end
+        return vim.fn.stdpath("data")
+          .. "/mason/packages/typescript-language-server/node_modules/typescript/lib"
+      end
+
+      lspconfig.ts_ls.setup({
+        capabilities = capabilities,
+        filetypes = { "vue" },
+        init_options = {
+          hostInfo = "neovim",
+          plugins = {
+            {
+              name = "@vue/typescript-plugin",
+              location = vue_language_server,
+              languages = { "vue" },
+            },
+          },
+        },
+      })
+
+      -- Volar: ดูแล .vue (template/HTML/CSS) และ forward คำสั่ง TS ไป ts_ls
+      lspconfig.volar.setup({
+        capabilities = capabilities,
+        filetypes = { "vue" },
+        init_options = {
+          typescript = { tsdk = get_tsdk(vim.loop.cwd()) },
+        },
+        on_init = function(client)
+          local retries = 0
+          local function typescriptHandler(_, result, context)
+            local ts_client = vim.lsp.get_clients({ bufnr = context.bufnr, name = "vtsls" })[1]
+              or vim.lsp.get_clients({ bufnr = context.bufnr, name = "ts_ls" })[1]
+              or vim.lsp.get_clients({ bufnr = context.bufnr, name = "typescript-tools" })[1]
+
+            if not ts_client then
+              if retries <= 10 then
+                retries = retries + 1
+                vim.defer_fn(function() typescriptHandler(_, result, context) end, 100)
+              else
+                vim.notify(
+                  "Could not find `vtsls`/`ts_ls`/`typescript-tools` required by `vue_ls`.",
+                  vim.log.levels.ERROR
+                )
+              end
+              return
+            end
+
+            local param = unpack(result)
+            local id, command, payload = unpack(param)
+            ts_client:exec_cmd({
+              title = "vue_request_forward",
+              command = "typescript.tsserverRequest",
+              arguments = { command, payload },
+            }, { bufnr = context.bufnr }, function(_, r)
+              local response_data = { { id, r and r.body } }
+              client:notify("tsserver/response", response_data)
+            end)
+          end
+
+          client.handlers["tsserver/request"] = typescriptHandler
+        end,
+      })
+      -- ---------- /Hybrid Vue ----------
+
+      -- HTML
+      lspconfig.html.setup({
+        filetypes = { "html", "ejs" },
+        capabilities = capabilities,
+      })
+
+      -- CSS
+      lspconfig.cssls.setup({ capabilities = capabilities })
+
+      -- Python
+      lspconfig.pyright.setup({ capabilities = capabilities })
+
+      -- XML
+      lspconfig.lemminx.setup({ capabilities = capabilities })
+    end,
+  },
 }
--- return {
---   "neovim/nvim-lspconfig",
---   opts = {
---     servers = {
---       tsserver = { enabled = false },
---       ts_ls    = { enabled = false },
---
---       -- ✅ TypeScript/JavaScript → ให้ vtsls ดูแล (ไม่มี "vue")
---       vtsls = {
---         enabled = true,
---         filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact" },
---         init_options = {
---           maxTsServerMemory = 8192,
---           typescript = {
---             tsserver = {
---               maxTsServerMemory = 8192,
---               experimental = { enableProjectDiagnostics = false },
---             },
---           },
---         },
---         settings = {
---           typescript = {
---             updateImportsOnFileMove = { enabled = "always" },
---             suggest = {
---               completeFunctionCalls = true,
---               includeCompletionsForModuleExports = true,
---               includeCompletionsForImportStatements = true,
---               includeCompletionsWithSnippetText = false,
---             },
---             preferences = {
---               includePackageJsonAutoImports = "auto",
---               importModuleSpecifier = "shortest",
---               includeCompletionsForImportStatements = true,
---             },
---             inlayHints = {
---               enumMemberValues = { enabled = false },
---               functionLikeReturnTypes = { enabled = false },
---               parameterNames = { enabled = "none" },
---               parameterTypes = { enabled = false },
---               propertyDeclarationTypes = { enabled = false },
---               variableTypes = { enabled = false },
---             },
---             surveys = { enabled = false },
---           },
---           javascript = {
---             updateImportsOnFileMove = { enabled = "always" },
---             suggest = {
---               completeFunctionCalls = true,
---               includeCompletionsForModuleExports = true,
---               includeCompletionsForImportStatements = true,
---               includeCompletionsWithSnippetText = false,
---             },
---             preferences = {
---               includePackageJsonAutoImports = "auto",
---               importModuleSpecifier = "shortest",
---             },
---             inlayHints = {
---               enumMemberValues = { enabled = false },
---               functionLikeReturnTypes = { enabled = false },
---               parameterNames = { enabled = "none" },
---               parameterTypes = { enabled = false },
---               propertyDeclarationTypes = { enabled = false },
---               variableTypes = { enabled = false },
---             },
---           },
---           vtsls = {
---             enableMoveToFileCodeAction = true,
---             autoUseWorkspaceTsdk = true,
---             experimental = {
---               completion = { enableServerSideFuzzyMatch = true, entriesLimit = 200 },
---             },
---           },
---         },
---         flags = { debounce_text_changes = 50 },
---       },
---
---       -- ✅ Vue SFC → ให้ Volar ดูแล
---       volar = {
---         filetypes = { "vue" },
---         single_file_support = false,
---         -- หา root โปรเจกต์ให้ฉลาด (รองรับ monorepo/workspace)
---         root_dir = function(fname)
---           local util = require("lspconfig.util")
---           return util.root_pattern(
---             "pnpm-workspace.yaml",
---             "package.json",
---             "vue.config.js",
---             "nuxt.config.ts",
---             "nuxt.config.js",
---             "tsconfig.json",
---             ".git"
---           )(fname) or vim.loop.cwd()
---         end,
---         -- คำนวณ tsdk จาก root_dir (ไม่ผูกกับ cwd)
---         on_new_config = function(new_config, new_root_dir)
---           local util = require("lspconfig.util")
---           local local_tsdk = util.path.join(new_root_dir, "node_modules", "typescript", "lib")
---           local tsdk = (vim.fn.isdirectory(local_tsdk) == 1)
---             and local_tsdk
---             or (vim.fn.stdpath("data")
---               .. "/mason/packages/typescript-language-server/node_modules/typescript/lib")
---           new_config.init_options = new_config.init_options or {}
---           new_config.init_options.typescript = new_config.init_options.typescript or {}
---           new_config.init_options.typescript.tsdk = tsdk
---         end,
---         init_options = {
---           documentFeatures = {
---             documentColor = true,
---             documentFormatting = false, -- ใช้ prettier/eslint ภายนอก
---             documentSymbol = true,
---             foldingRange = true,
---             selectionRange = true,
---             linkedEditingRange = true,
---             rename = true,
---           },
---           languageFeatures = {
---             codeAction = true,
---             codeLens = true,
---             completion = { defaultTagNameCase = "both", defaultAttrNameCase = "kebabCase" },
---             diagnostics = true,
---             hover = true,
---             references = true,
---             rename = true,
---             signatureHelp = true,
---             semanticTokens = true,
---           },
---         },
---       },
---
---       -- ✅ ESLint แยกต่างหาก
---       eslint = {
---         settings = {
---           run = "onSave",
---           codeActionOnSave = { enable = true, mode = "all" },
---           workingDirectory = { mode = "auto" },
---           format = false,
---         },
---         on_attach = function(client, bufnr)
---           client.server_capabilities.documentFormattingProvider = false
---           client.server_capabilities.documentRangeFormattingProvider = false
---           vim.keymap.set("n", "<leader>ce", function() vim.cmd("EslintFixAll") end,
---             { buffer = bufnr, desc = "ESLint Fix" })
---         end,
---       },
---
---       cssls = {
---         settings = {
---           css = { validate = true, lint = { unknownAtRules = "ignore" } },
---           scss = { validate = true },
---         },
---       },
---     },
---   },
--- }
