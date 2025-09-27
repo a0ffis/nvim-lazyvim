@@ -9,6 +9,7 @@ return {
       "css",
       "scss",
       "json",
+      "prisma",
     },
     highlight = {
       enable = true,

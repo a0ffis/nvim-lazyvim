@@ -1,7 +1,7 @@
 return {
   -- Mason core
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     config = function()
       require("mason").setup()
     end,
@@ -9,63 +9,9 @@ return {
 
   -- Mason LSP bridge
   {
-    "williamboman/mason-lspconfig.nvim",
+    "mason-org/mason-lspconfig.nvim",
     lazy = false,
     opts = { auto_install = true },
-  },
-
-  -- 🔁 blink.cmp
-  {
-    "saghen/blink.cmp",
-    lazy = false,
-    version = "*",
-    dependencies = {
-      "rafamadriz/friendly-snippets",
-    },
-    opts = {
-      -- ✅ keymap ตามที่ขอ
-      keymap = {
-        ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
-        ["<C-e>"] = { "hide", "fallback" },
-
-        ["<Tab>"] = {
-          function(cmp)
-            if cmp.snippet_active() then
-              return cmp.accept()
-            else
-              return cmp.select_and_accept()
-            end
-          end,
-          "snippet_forward",
-          "fallback",
-        },
-        ["<S-Tab>"] = { "snippet_backward", "fallback" },
-
-        ["<Up>"] = { "select_prev", "fallback" },
-        ["<Down>"] = { "select_next", "fallback" },
-        ["<C-k>"] = { "select_prev", "fallback_to_mappings" },
-        ["<C-j>"] = { "select_next", "fallback_to_mappings" },
-      },
-
-      -- ✅ แก้ selection ให้เป็น table (ไม่ใช่ string)
-      completion = {
-        list = { selection = { preselect = false, auto_insert = true } },
-        documentation = { auto_show = true, auto_show_delay_ms = 200 },
-        ghost_text = { enabled = true },
-      },
-
-      snippets = { preset = "default" },
-      sources = {
-        default = { "lsp", "path", "snippets", "buffer" },
-        -- ถ้าใช้ copilot และขึ้นซ้ำ 2 อัน ให้ลบ/ปิด copilot-cmp แล้วเพิ่ม/ลบ "copilot" ที่นี่ตามต้องการ
-        -- default = { "lsp", "path", "snippets", "buffer", "copilot" },
-      },
-      signature = { enabled = true },
-      appearance = {
-        use_nvim_cmp_as_default = true,
-        nerd_font_variant = "mono",
-      },
-    },
   },
 
   -- LSP config (ใช้ capabilities จาก blink.cmp)
@@ -94,24 +40,29 @@ return {
       -- Lua
       lspconfig.lua_ls.setup({ capabilities = capabilities })
 
-
       lspconfig.vtsls.setup({
         capabilities = capabilities,
         filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
+        on_attach = function(client, bufnr)
+          client.server_capabilities.documentHighlightProvider = false
+        end,
       })
 
-
-      -- ---------- Hybrid Vue (Volar + vtsls) ----------
-      local mason_registry = require("mason-registry")
-      local vue_language_server = mason_registry
-        .get_package("vue-language-server")
-        :get_install_path() .. "/node_modules/@vue/language-server"
+      -- ---------- Hybrid Vue (Volar + ts_ls) ----------
+      local local_ls = vim.fs.find("node_modules/@vue/language-server", { path = vim.loop.cwd(), upward = true })[1]
+      local MASON = vim.fn.expand("$MASON")
+      if MASON == "" or MASON == "$MASON" then
+        MASON = vim.fn.stdpath("data") .. "/mason"
+      end
+      local vue_language_server = local_ls
+        or (MASON .. "/packages/vue-language-server/node_modules/@vue/language-server")
 
       local function get_tsdk(root_dir)
         local local_ts = vim.fs.find("node_modules/typescript/lib", { path = root_dir, upward = true })[1]
-        if local_ts then return local_ts end
-        return vim.fn.stdpath("data")
-          .. "/mason/packages/typescript-language-server/node_modules/typescript/lib"
+        if local_ts then
+          return local_ts
+        end
+        return vim.fn.stdpath("data") .. "/mason/packages/typescript-language-server/node_modules/typescript/lib"
       end
 
       lspconfig.ts_ls.setup({
@@ -146,7 +97,9 @@ return {
             if not ts_client then
               if retries <= 10 then
                 retries = retries + 1
-                vim.defer_fn(function() typescriptHandler(_, result, context) end, 100)
+                vim.defer_fn(function()
+                  typescriptHandler(_, result, context)
+                end, 100)
               else
                 vim.notify(
                   "Could not find `vtsls`/`ts_ls`/`typescript-tools` required by `vue_ls`.",
@@ -187,6 +140,9 @@ return {
 
       -- XML
       lspconfig.lemminx.setup({ capabilities = capabilities })
+
+      -- Prisma
+      lspconfig.prismals.setup({ capabilities = capabilities })
     end,
   },
 }
