@@ -143,6 +143,9 @@ return {
 
       -- Prisma
       lspconfig.prismals.setup({ capabilities = capabilities })
+
+      -- tailwindcss
+      lspconfig.tailwindcss.setup({ capabilities = capabilities })
     end,
   },
 }
